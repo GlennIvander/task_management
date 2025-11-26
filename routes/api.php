@@ -12,14 +12,10 @@ use Illuminate\Support\Facades\Route;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login',    [AuthController::class, 'login']);
 
-// Protected API
 Route::middleware('auth:sanctum')->group(function () {
-    // Tasks resource
     Route::post('tasks', [TaskController::class, 'store']);
     Route::put('tasks/{task}', [TaskController::class, 'update']);
     Route::delete('tasks/{task}', [TaskController::class, 'destroy']);
-
-    // Auth
     Route::post('logout', [AuthController::class, 'logout']);
 });
 

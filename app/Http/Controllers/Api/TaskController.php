@@ -9,6 +9,7 @@ use App\Http\Resources\TaskCollection;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -16,6 +17,7 @@ class TaskController extends Controller
     // GET /api/tasks
     public function index(Request $request)
     {
+        Gate::authorize('modify', $request);
         $perPage = $request->query('per_page', 10);
 
         $tasks = Task::query()
@@ -30,6 +32,7 @@ class TaskController extends Controller
     // GET /api/tasks/{id}
     public function show(Task $task)
     {
+        Gate::authorize('modify', $task);
         return new TaskResource($task);
     }
 
@@ -45,6 +48,7 @@ class TaskController extends Controller
     // PUT /api/tasks/{id}
     public function update(UpdateTaskRequest $request, Task $task)
     {
+        Gate::authorize('modify', $task);
         $task->update($request->validated());
 
         return new TaskResource($task);
@@ -53,6 +57,7 @@ class TaskController extends Controller
     // DELETE /api/tasks/{id} (soft delete)
     public function destroy(Task $task)
     {
+        Gate::authorize('modify', $task);
         $task->delete();
 
         return response()->json(['message' => 'Task soft deleted.'], 200);
