@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+
     // GET /api/tasks
     public function index(Request $request)
     {
@@ -35,7 +36,8 @@ class TaskController extends Controller
     // POST /api/tasks
     public function store(StoreTaskRequest $request)
     {
-        $task = Task::create($request->validated());
+
+        $task = $request->user()->tasks()->create($request->validated());
 
         return (new TaskResource($task))->response()->setStatusCode(201);
     }
