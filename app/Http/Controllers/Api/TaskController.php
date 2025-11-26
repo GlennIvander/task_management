@@ -3,47 +3,56 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\TaskCollection;
+use App\Http\Resources\TaskResource;
+use App\Models\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // GET /api/tasks
+    public function index(Request $request)
     {
-        //
+        $perPage = $request->query('per_page', 10);
+
+        $tasks = Task::query()
+            ->search($request->query('search'))
+            ->status($request->query('status'))
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+
+        return new TaskCollection($tasks);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // GET /api/tasks/{id}
+    public function show(Task $task)
     {
-        //
+        return new TaskResource($task);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // POST /api/tasks
+    public function store(StoreTaskRequest $request)
     {
-        //
+        $task = Task::create($request->validated());
+
+        return (new TaskResource($task))->response()->setStatusCode(201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // PUT /api/tasks/{id}
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        //
+        $task->update($request->validated());
+
+        return new TaskResource($task);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    // DELETE /api/tasks/{id} (soft delete)
+    public function destroy(Task $task)
     {
-        //
+        $task->delete();
+
+        return response()->json(['message' => 'Task soft deleted.'], 200);
     }
 }
