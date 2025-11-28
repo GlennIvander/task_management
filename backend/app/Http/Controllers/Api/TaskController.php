@@ -17,7 +17,6 @@ class TaskController extends Controller
     // GET /api/tasks
     public function index(Request $request)
     {
-        Gate::authorize('modify', $request);
         $perPage = $request->query('per_page', 10);
 
         $tasks = Task::query()
@@ -32,7 +31,6 @@ class TaskController extends Controller
     // GET /api/tasks/{id}
     public function show(Task $task)
     {
-        Gate::authorize('modify', $task);
         return new TaskResource($task);
     }
 
