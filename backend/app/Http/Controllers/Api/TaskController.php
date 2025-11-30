@@ -20,6 +20,7 @@ class TaskController extends Controller
         $perPage = $request->query('per_page', 10);
 
         $tasks = Task::query()
+            ->with('user')->latest()
             ->search($request->query('search'))
             ->status($request->query('status'))
             ->orderBy('created_at', 'desc')
@@ -31,16 +32,24 @@ class TaskController extends Controller
     // GET /api/tasks/{id}
     public function show(Task $task)
     {
-        return new TaskResource($task);
+        $task->load('user');
+
+        return response()->json([
+            'task' => new TaskResource($task),
+            'user' => $task->user,
+        ], 201);
     }
 
     // POST /api/tasks
     public function store(StoreTaskRequest $request)
     {
-
         $task = $request->user()->tasks()->create($request->validated());
+        $task->load('user');
 
-        return (new TaskResource($task))->response()->setStatusCode(201);
+        return response()->json([
+            'task' => new TaskResource($task),
+            'user' => $task->user,
+        ], 201);
     }
 
     // PUT /api/tasks/{id}
@@ -49,7 +58,12 @@ class TaskController extends Controller
         Gate::authorize('modify', $task);
         $task->update($request->validated());
 
-        return new TaskResource($task);
+        $task->load('user');
+
+        return response()->json([
+            'task' => new TaskResource($task),
+            'user' => $task->user,
+        ], 201);
     }
 
     // DELETE /api/tasks/{id} (soft delete)

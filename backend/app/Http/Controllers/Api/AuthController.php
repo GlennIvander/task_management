@@ -46,7 +46,9 @@ class AuthController extends Controller
             //     ]
             // ];
             return [
-                'message' => 'The provided credentials are incorrect.' 
+                'errors' => [
+                    'email' => ['The provided credentials are incorrect.']
+                ] 
             ];
         }
 
